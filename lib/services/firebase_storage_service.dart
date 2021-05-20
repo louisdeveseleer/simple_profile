@@ -21,6 +21,13 @@ class FirebaseStorageService {
     @required File image,
     @required userId,
   }) async {
+    if (image == null) {
+      return null;
+    }
+    if (!image.existsSync()) {
+      print('No file');
+      return null;
+    }
     String path = 'users/$userId/profilePic';
     Reference reference = _firebaseStorage.ref(path);
     UploadTask uploadTask;

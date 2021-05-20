@@ -66,78 +66,80 @@ class _ProfilePageState extends State<ProfilePage> {
             );
           } else {
             _userProfile = snapshot.data ?? UserProfile();
-            return Stack(
-              children: [
-                SingleChildScrollView(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ProfileSection(
-                        title: 'First name',
-                        child: MyTextField(
-                          enabled: _isInEditMode,
-                          initialValue: _userProfile?.firstName,
-                          onChanged: _onChangedFirstName,
-                          hintText: 'First name',
+            return SafeArea(
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ProfileSection(
+                          title: 'First name',
+                          child: MyTextField(
+                            enabled: _isInEditMode,
+                            initialValue: _userProfile?.firstName,
+                            onChanged: _onChangedFirstName,
+                            hintText: 'First name',
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 24,
-                      ),
-                      ProfileSection(
-                        title: 'Last name',
-                        child: MyTextField(
-                          enabled: _isInEditMode,
-                          initialValue: _userProfile?.lastName,
-                          onChanged: _onChangedLastName,
-                          hintText: 'Last name',
+                        SizedBox(
+                          height: 24,
                         ),
-                      ),
-                      SizedBox(
-                        height: 24,
-                      ),
-                      ProfileSection(
-                        title: 'Birth date',
-                        child: BirthdatePicker(
-                          enabled: _isInEditMode,
-                          initialValue: _userProfile.birthDate,
-                          onChanged: _onChangedBirthdate,
+                        ProfileSection(
+                          title: 'Last name',
+                          child: MyTextField(
+                            enabled: _isInEditMode,
+                            initialValue: _userProfile?.lastName,
+                            onChanged: _onChangedLastName,
+                            hintText: 'Last name',
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 24,
-                      ),
-                      ProfileSection(
-                        title: 'Avatar',
-                        child: AvatarPicker(
-                          enabled: _isInEditMode,
-                          initialUrl: _userProfile.profilePicUrl,
-                          onChanged: _onChangedAvatarUrl,
-                          userId: _databaseCRUD.uid,
+                        SizedBox(
+                          height: 24,
                         ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                      ),
-                    ],
+                        ProfileSection(
+                          title: 'Birth date',
+                          child: BirthdatePicker(
+                            enabled: _isInEditMode,
+                            initialValue: _userProfile.birthDate,
+                            onChanged: _onChangedBirthdate,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 24,
+                        ),
+                        ProfileSection(
+                          title: 'Avatar',
+                          child: AvatarPicker(
+                            enabled: _isInEditMode,
+                            initialUrl: _userProfile.profilePicUrl,
+                            onChanged: _onChangedAvatarUrl,
+                            userId: _databaseCRUD.uid,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 50,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: _toggleMode,
-                        icon: Icon(_isInEditMode ? Icons.check : Icons.edit),
-                        label: Text(_isInEditMode ? 'SAVE' : 'EDIT'),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: _toggleMode,
+                          icon: Icon(_isInEditMode ? Icons.check : Icons.edit),
+                          label: Text(_isInEditMode ? 'SAVE' : 'EDIT'),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
           }
         },

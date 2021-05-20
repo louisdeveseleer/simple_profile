@@ -22,7 +22,7 @@ class _MyTextFieldState extends State<MyTextField> {
 
   @override
   void initState() {
-    _controller.text = widget.initialValue ?? '';
+    _controller.text = widget.initialValue ?? '-';
     _controller.addListener(() {
       widget.onChanged(_controller.value.text);
     });

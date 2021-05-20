@@ -33,13 +33,18 @@ class _BirthdatePickerState extends State<BirthdatePicker> {
       await showCupertinoModalPopup(
           context: context,
           builder: (BuildContext builder) {
-            return CupertinoDatePicker(
-              initialDateTime: selectedDate ?? DateTime.now(),
-              maximumDate: DateTime.now(),
-              maximumYear: DateTime.now().year,
-              mode: CupertinoDatePickerMode.date,
-              minimumYear: 1900,
-              onDateTimeChanged: (DateTime value) => datePicked = value,
+            return CupertinoPopupSurface(
+              child: Container(
+                height: 300,
+                child: CupertinoDatePicker(
+                  initialDateTime: selectedDate ?? DateTime.now(),
+                  maximumDate: DateTime.now(),
+                  maximumYear: DateTime.now().year,
+                  mode: CupertinoDatePickerMode.date,
+                  minimumYear: 1900,
+                  onDateTimeChanged: (DateTime value) => datePicked = value,
+                ),
+              ),
             );
           });
       _updateValue(datePicked);
@@ -63,16 +68,16 @@ class _BirthdatePickerState extends State<BirthdatePicker> {
   Widget build(BuildContext context) {
     return widget.enabled
         ? OutlinedButton(
-            child: dateText('Click here'),
+            child: dateText(emptyLabel: 'Click here'),
             onPressed: () => _onPressed(context),
           )
-        : dateText('No date selected');
+        : dateText(emptyLabel: '-');
   }
 
-  Widget dateText(String emptyLabel) {
+  Widget dateText({String emptyLabel}) {
     return Text(
       selectedDate == null
-          ? emptyLabel
+          ? (emptyLabel ?? '')
           : DateFormat.yMMMd().format(selectedDate),
       style: Theme.of(context).textTheme.bodyText1,
     );

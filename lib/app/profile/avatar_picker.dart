@@ -29,16 +29,15 @@ class _AvatarPickerState extends State<AvatarPicker> {
   bool loading = false;
 
   void _onTap() async {
-    final picker.ImagePicker _picker = picker.ImagePicker();
-    final pickedFile = await _picker.getImage(
+    final pickedFile = await picker.ImagePicker().getImage(
       source: picker.ImageSource.gallery,
-      imageQuality: 10,
+      imageQuality: 1,
     );
     if (pickedFile != null) {
       setState(() {
         loading = true;
       });
-      File pickedImage = File(pickedFile.path);
+      final File pickedImage = File(pickedFile.path);
       var decodedImage =
           await decodeImageFromList(pickedImage.readAsBytesSync());
       final int width = decodedImage.width;
@@ -49,19 +48,22 @@ class _AvatarPickerState extends State<AvatarPicker> {
       if (width > height) {
         isPortrait = false;
       }
+
       imageEditorOption.addOption(editor.ClipOption(
         x: isPortrait ? 0 : (width - height) / 2,
         y: isPortrait ? (height - width) / 2 : 0,
         width: isPortrait ? width : height,
         height: isPortrait ? width : height,
       ));
+
       imageEditorOption.addOption(editor.ScaleOption(67, 67));
       File modifiedImage = await editor.ImageEditor.editFileImageAndGetFile(
-        file: File(pickedFile.path),
+        file: pickedImage,
         imageEditorOption: imageEditorOption,
       );
       url = await firebaseStorageService.uploadUserProfilePicture(
         image: modifiedImage,
+        //image: pickedImage,
         userId: widget.userId,
       );
       widget.onChanged(url);
