@@ -12,6 +12,10 @@ class ProfilePage extends ConsumerWidget {
     databaseCRUD.updateUserProfile(userProfile);
   }
 
+  Future<void> _onExit(BuildContext context) async {
+    await context.read(authServiceProvider).signOut();
+  }
+
   @override
   Widget build(BuildContext context, ScopedReader watch) {
     DatabaseCRUD databaseCRUD = watch(databaseProvider);
@@ -19,6 +23,12 @@ class ProfilePage extends ConsumerWidget {
       appBar: AppBar(
         leading: Icon(Icons.person),
         title: Text('Profile'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete_forever),
+            onPressed: () => _onExit(context),
+          ),
+        ],
       ),
       body: databaseCRUD == null
           ? loadingWidget
