@@ -28,42 +28,44 @@ class _AvatarPickerState extends State<AvatarPicker> {
   String url;
   bool loading = false;
 
-  void _onTap() async {
+  Future<File> cropAndScale(File originalImage) async {
+    final decodedImage =
+        await decodeImageFromList(originalImage.readAsBytesSync());
+    final int width = decodedImage.width;
+    final int height = decodedImage.height;
+
+    editor.ImageEditorOption imageEditorOption = editor.ImageEditorOption();
+    bool isPortrait = true;
+    if (width > height) {
+      isPortrait = false;
+    }
+
+    imageEditorOption.addOption(editor.ClipOption(
+      x: isPortrait ? 0 : (width - height) / 2,
+      y: isPortrait ? (height - width) / 2 : 0,
+      width: isPortrait ? width : height,
+      height: isPortrait ? width : height,
+    ));
+
+    imageEditorOption.addOption(editor.ScaleOption(67, 67));
+    return await editor.ImageEditor.editFileImageAndGetFile(
+      file: originalImage,
+      imageEditorOption: imageEditorOption,
+    );
+  }
+
+  void onTap() async {
     final pickedFile = await picker.ImagePicker().getImage(
       source: picker.ImageSource.gallery,
-      imageQuality: 1,
     );
     if (pickedFile != null) {
       setState(() {
         loading = true;
       });
       final File pickedImage = File(pickedFile.path);
-      var decodedImage =
-          await decodeImageFromList(pickedImage.readAsBytesSync());
-      final int width = decodedImage.width;
-      final int height = decodedImage.height;
-
-      editor.ImageEditorOption imageEditorOption = editor.ImageEditorOption();
-      bool isPortrait = true;
-      if (width > height) {
-        isPortrait = false;
-      }
-
-      imageEditorOption.addOption(editor.ClipOption(
-        x: isPortrait ? 0 : (width - height) / 2,
-        y: isPortrait ? (height - width) / 2 : 0,
-        width: isPortrait ? width : height,
-        height: isPortrait ? width : height,
-      ));
-
-      imageEditorOption.addOption(editor.ScaleOption(67, 67));
-      File modifiedImage = await editor.ImageEditor.editFileImageAndGetFile(
-        file: pickedImage,
-        imageEditorOption: imageEditorOption,
-      );
+      final File modifiedImage = await cropAndScale(pickedImage);
       url = await firebaseStorageService.uploadUserProfilePicture(
         image: modifiedImage,
-        //image: pickedImage,
         userId: widget.userId,
       );
       widget.onChanged(url);
@@ -83,7 +85,7 @@ class _AvatarPickerState extends State<AvatarPicker> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: widget.enabled ? _onTap : null,
+      onTap: widget.enabled ? onTap : null,
       child: CircleAvatar(
         radius: 30,
         child: loading
