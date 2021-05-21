@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 
@@ -18,21 +19,17 @@ class FirebaseStorageService {
   }
 
   Future<String> uploadUserProfilePicture({
-    @required File image,
+    @required Uint8List image,
     @required userId,
   }) async {
     if (image == null) {
-      return null;
-    }
-    if (!image.existsSync()) {
-      print('No file');
       return null;
     }
     String path = 'users/$userId/profilePic';
     Reference reference = _firebaseStorage.ref(path);
     UploadTask uploadTask;
     try {
-      uploadTask = reference.putFile(image);
+      uploadTask = reference.putData(image);
     } catch (e) {
       print(e);
     }
