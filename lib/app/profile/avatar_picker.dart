@@ -1,9 +1,9 @@
 import 'dart:io';
-
 import 'package:breakthrough_apps_challenge/services/firebase_storage_service.dart';
 import 'package:breakthrough_apps_challenge/app/top_level_providers.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:image_editor/image_editor.dart' as editor;
+import 'package:image_crop/image_crop.dart';
 import 'package:image_picker/image_picker.dart' as picker;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,29 +29,47 @@ class _AvatarPickerState extends State<AvatarPicker> {
   bool loading = false;
 
   Future<File> cropAndScale(File originalImage) async {
-    final decodedImage =
-        await decodeImageFromList(originalImage.readAsBytesSync());
-    final int width = decodedImage.width;
-    final int height = decodedImage.height;
-
-    editor.ImageEditorOption imageEditorOption = editor.ImageEditorOption();
-    bool isPortrait = true;
-    if (width > height) {
-      isPortrait = false;
-    }
-
-    imageEditorOption.addOption(editor.ClipOption(
-      x: isPortrait ? 0 : (width - height) / 2,
-      y: isPortrait ? (height - width) / 2 : 0,
-      width: isPortrait ? width : height,
-      height: isPortrait ? width : height,
-    ));
-
-    imageEditorOption.addOption(editor.ScaleOption(67, 67));
-    return await editor.ImageEditor.editFileImageAndGetFile(
-      file: originalImage,
-      imageEditorOption: imageEditorOption,
-    );
+    final cropKey = GlobalKey<CropState>();
+    File modifiedImage;
+    await showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoPopupSurface(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: EdgeInsets.all(16),
+              height: 300,
+              child: Crop.file(
+                originalImage,
+                key: cropKey,
+                aspectRatio: 1.0,
+              ),
+            ),
+            ElevatedButton.icon(
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(Icons.check),
+              label: Text('Validate'),
+            ),
+          ],
+        ),
+      ),
+    ).whenComplete(() async {
+      final scale = cropKey.currentState.scale;
+      final area = cropKey.currentState.area;
+      if (area == null) {
+        return;
+      }
+      var decodedImage =
+          await decodeImageFromList(originalImage.readAsBytesSync());
+      int width = decodedImage.width;
+      modifiedImage = await ImageCrop.cropImage(
+        file: originalImage,
+        area: area,
+        scale: 67 / (width * scale),
+      );
+    });
+    return modifiedImage;
   }
 
   void onTap() async {
