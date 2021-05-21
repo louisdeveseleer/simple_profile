@@ -22,7 +22,7 @@ class _MyTextFieldState extends State<MyTextField> {
 
   @override
   void initState() {
-    _controller.text = widget.initialValue ?? '-';
+    _controller.text = widget.initialValue;
     _controller.addListener(() {
       widget.onChanged(_controller.value.text);
     });
@@ -36,11 +36,11 @@ class _MyTextFieldState extends State<MyTextField> {
         controller: _controller,
         maxLength: 30,
         decoration: InputDecoration(
-          hintText: 'Name',
+          hintText: widget.hintText,
         ),
       );
     } else {
-      return Text(_controller.value.text);
+      return Text(_controller.text.isEmpty ? '-' : _controller.text);
     }
   }
 }

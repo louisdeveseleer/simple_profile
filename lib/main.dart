@@ -29,9 +29,7 @@ class MyApp extends StatelessWidget {
       ),
       // home: ProfilePage(),
       home: AuthWidget(
-        builder: (uid) => ProfilePage(
-          uid: uid,
-        ),
+        child: ProfilePage(),
       ),
     );
   }

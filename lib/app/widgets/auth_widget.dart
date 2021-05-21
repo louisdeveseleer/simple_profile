@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class AuthWidget extends ConsumerWidget {
   const AuthWidget({
     Key key,
-    @required this.builder,
+    @required this.child,
   }) : super(key: key);
-  final Function(String uid) builder;
+  final Widget child;
 
   Widget _loadingWidget() {
     return const Scaffold(
@@ -24,7 +24,7 @@ class AuthWidget extends ConsumerWidget {
     ));
   }
 
-  Widget signIn(BuildContext context) {
+  Widget _signIn(BuildContext context) {
     context.read(authServiceProvider).signInAnonymously();
     return _loadingWidget();
   }
@@ -33,7 +33,7 @@ class AuthWidget extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
     final authStateChanges = watch(authStateChangesProvider);
     return authStateChanges.when(
-      data: (user) => user != null ? builder(user.uid) : signIn(context),
+      data: (user) => user != null ? child : _signIn(context),
       loading: _loadingWidget,
       error: _errorWidget,
     );
